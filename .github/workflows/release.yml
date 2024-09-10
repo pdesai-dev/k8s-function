@@ -30,8 +30,8 @@ jobs:
     - name: Build installer
       run: make build-installer
       
-    - name: Build Docker Image
-      run: make docker-buildx IMG=piased/k8s-function:v0.0.0
+    #- name: Build Docker Image
+      #run: make docker-buildx IMG=piased/k8s-function:v0.0.0
       
     - name: Get version from tag
       run: echo "VERSION=${GITHUB_REF#refs/tags/v}"
