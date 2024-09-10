@@ -74,7 +74,7 @@ func (r *FunctionReconciler) Reconcile(ctx context.Context, req ctrl.Request) (c
 	})
 
 	if len(activePods) < int(*function.Spec.Replicas) {
-		podsToCreate := int(*function.Spec.Replicas) - len(activePods) 
+		podsToCreate := int(*function.Spec.Replicas) - len(activePods)
 		for i := 0; i < podsToCreate; i++ {
 			pod := r.podForFunction(&function)
 			logger.Info("Creating a new Pod", "Pod.Namespace", pod.Namespace, "Pod.Name", pod.Name)
@@ -129,10 +129,10 @@ func (r *FunctionReconciler) Reconcile(ctx context.Context, req ctrl.Request) (c
 func (r *FunctionReconciler) podForFunction(function *k8sfunctionsv1alpha1.Function) *corev1.Pod {
 	labels := labelsForFunction(function)
 	envVars := []corev1.EnvVar{}
-  	for key, value := range function.Spec.EnvVariables {
+	for key, value := range function.Spec.EnvVariables {
 		envVars = append(envVars, corev1.EnvVar{
-		Name:  key,
-		Value: value,
+			Name:  key,
+			Value: value,
 		})
 	}
 	command := []string{}
@@ -146,18 +146,18 @@ func (r *FunctionReconciler) podForFunction(function *k8sfunctionsv1alpha1.Funct
 		},
 		Spec: corev1.PodSpec{
 			Containers: []corev1.Container{{
-				Name:  "function",
-				Image: function.Spec.RuntimeImage,
+				Name:    "function",
+				Image:   function.Spec.RuntimeImage,
 				Command: command,
 				/*
-				Command: []string{
-					"python", 
-					"-u",
-					"-c",
-					function.Spec.Code,
-				  },
-				  */
-				  Env: envVars,
+					Command: []string{
+						"python",
+						"-u",
+						"-c",
+						function.Spec.Code,
+					  },
+				*/
+				Env: envVars,
 			}},
 			RestartPolicy: corev1.RestartPolicyNever,
 		},

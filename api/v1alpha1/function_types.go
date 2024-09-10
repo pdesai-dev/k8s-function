@@ -25,7 +25,6 @@ import (
 
 // FunctionSpec defines the desired state of Function
 type FunctionSpec struct {
-
 	RuntimeImage string `json:"runtimeImage"`
 
 	Code string `json:"code"`
@@ -52,11 +51,11 @@ type FunctionSpec struct {
 
 // FunctionStatus defines the observed state of Function
 type FunctionStatus struct {
-	Replicas    int32              `json:"replicas"`
-	Active 		int32              `json:"active"`
-	Completed 	int32              `json:"completed"`
-	Created 	int32              `json:"created"`
-	Selector    string             `json:"selector,omitempty"`
+	Replicas  int32  `json:"replicas"`
+	Active    int32  `json:"active"`
+	Completed int32  `json:"completed"`
+	Created   int32  `json:"created"`
+	Selector  string `json:"selector,omitempty"`
 }
 
 // +kubebuilder:object:root=true
