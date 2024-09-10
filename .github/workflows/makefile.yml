@@ -14,13 +14,9 @@ jobs:
     steps:
     - name: Setup Go environment
       uses: actions/setup-go@v5.0.2
-      with:
-        # Path to the go.mod or go.work file.
-        go-version-file: go.mod
-        # Target architecture for Go to use. Examples: x86, x64. Will use system architecture by default.
-        architecture: x64
-              
-    - uses: actions/checkout@v4
+    
+    - name: Checkout source
+      uses: actions/checkout@v4
       
     - name: Build
       run: make
