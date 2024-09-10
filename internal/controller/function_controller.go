@@ -82,8 +82,6 @@ func (r *FunctionReconciler) Reconcile(ctx context.Context, req ctrl.Request) (c
 				logger.Error(err, "Failed to create new Pod", "Pod.Namespace", pod.Namespace, "Pod.Name", pod.Name)
 				return ctrl.Result{}, err
 			}
-			//keep a count of all pods created
-			function.Status.Created++
 		}
 	} else if len(activePods) > int(*function.Spec.Replicas) {
 		podsToDelete := activePods[*function.Spec.Replicas:]

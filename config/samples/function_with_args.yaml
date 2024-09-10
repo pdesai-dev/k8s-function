@@ -1,0 +1,27 @@
+apiVersion: k8s-function.io/v1alpha1
+kind: Function
+metadata:
+  labels:
+    app.kubernetes.io/name: functions
+    app.kubernetes.io/managed-by: kustomize
+  name: f2
+spec:
+  runtimeImage: "python:3.9"
+  replicas: 1
+  code: |
+    import os
+    import time
+    import sys
+    import random
+
+    print(os.environ.get('key1', 'Not set'))
+
+    print(f'Hello {sys.argv[1]} !')
+    sleep_time = random.uniform(5, 10)
+    time.sleep(sleep_time)
+    print(f"Slept for {sleep_time:.2f} seconds")
+  args:
+    - arg1
+  envVariables:
+    key1: val1
+  ttlSecondsAfterFinished: 20

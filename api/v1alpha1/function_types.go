@@ -25,8 +25,6 @@ import (
 
 // FunctionSpec defines the desired state of Function
 type FunctionSpec struct {
-	// INSERT ADDITIONAL SPEC FIELDS - desired state of cluster
-	// Important: Run "make" to regenerate code after modifying this file
 
 	RuntimeImage string `json:"runtimeImage"`
 
@@ -54,8 +52,6 @@ type FunctionSpec struct {
 
 // FunctionStatus defines the observed state of Function
 type FunctionStatus struct {
-	// INSERT ADDITIONAL STATUS FIELD - define observed state of cluster
-	// Important: Run "make" to regenerate code after modifying this file
 	Replicas    int32              `json:"replicas"`
 	Active 		int32              `json:"active"`
 	Completed 	int32              `json:"completed"`

@@ -91,9 +91,6 @@ spec:
                 format: int32
                 type: integer
               replicas:
-                description: |-
-                  INSERT ADDITIONAL STATUS FIELD - define observed state of cluster
-                  Important: Run "make" to regenerate code after modifying this file
                 format: int32
                 type: integer
               selector:
