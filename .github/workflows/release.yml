@@ -8,9 +8,6 @@ on:
         description: 'Log level'
         required: true
         default: 'warning'
-      tags:
-        description: 'Test scenario tags'
-        required: false
 
 env:
   IMAGE_NAME: k8s-function
@@ -27,19 +24,15 @@ jobs:
     - name: Checkout source
       uses: actions/checkout@v4
       
-    #- name: Build
-      #run: make
+    - name: Build
+      run: make
       
-    #- name: Build installer
-      #run: make build-installer
+    - name: Build installer
+      run: make build-installer
       
     - name: Log in to registry
       run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
 
-    #- name: Build Docker Image
-      #run: make docker-buildx IMG=piased/k8s-function:v0.0.0
-      
-        #[[ "${{ github.ref }}" == "refs/tags/"* ]] && VERSION=$(echo $VERSION | sed -e 's/^v//')
     - name: Build and push image
       run: |
         IMAGE_ID=ghcr.io/${{ github.repository_owner }}/$IMAGE_NAME
@@ -47,11 +40,10 @@ jobs:
 
         VERSION=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')
 
-
         [ "$VERSION" == "main" ] && VERSION=latest
         echo IMAGE_ID=$IMAGE_ID
         echo VERSION=$VERSION
-        echo ${{ github.repository }}
+        echo ${{ github.ref_name }}
         echo make docker-build IMG=$IMAGE_ID:$VERSION
         echo make docker-push IMG=$IMAGE_ID:$VERSION
 
