@@ -12,6 +12,9 @@ on:
         description: 'Test scenario tags'
         required: false
 
+env:
+  IMAGE_NAME: k8s-function
+
 jobs:
   build:
 
@@ -24,27 +27,43 @@ jobs:
     - name: Checkout source
       uses: actions/checkout@v4
       
-    - name: Build
-      run: make
+    #- name: Build
+      #run: make
       
-    - name: Build installer
-      run: make build-installer
+    #- name: Build installer
+      #run: make build-installer
       
+    - name: Log in to registry
+      run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+
     #- name: Build Docker Image
       #run: make docker-buildx IMG=piased/k8s-function:v0.0.0
       
-    - name: Get version from tag
-      run: echo "VERSION=${GITHUB_REF#refs/tags/v}"
+        #[[ "${{ github.ref }}" == "refs/tags/"* ]] && VERSION=$(echo $VERSION | sed -e 's/^v//')
+    - name: Build and push image
+      run: |
+        IMAGE_ID=ghcr.io/${{ github.repository_owner }}/$IMAGE_NAME
+        IMAGE_ID=$(echo $IMAGE_ID | tr '[A-Z]' '[a-z]')
 
-    - name: release
-      uses: actions/create-release@v1
-      id: create_release
-      with:
-        draft: false
-        prerelease: false
-        release_name: ${{ github.ref_name }}
-        tag_name: ${{ github.ref }}
-        body_path: CHANGELOG.md
+        VERSION=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')
+
+
+        [ "$VERSION" == "main" ] && VERSION=latest
+        echo IMAGE_ID=$IMAGE_ID
+        echo VERSION=$VERSION
+        echo ${{ github.repository }}
+        echo make docker-build IMG=$IMAGE_ID:$VERSION
+        echo make docker-push IMG=$IMAGE_ID:$VERSION
+
+    #- name: release
+      #uses: actions/create-release@v1
+      #id: create_release
+      #with:
+        #draft: false
+        #prerelease: false
+        #release_name: ${{ github.ref_name }}
+        #tag_name: ${{ github.ref }}
+        #body_path: CHANGELOG.md
 
     - name: Upload install.yaml
       uses: actions/upload-release-asset@v1
