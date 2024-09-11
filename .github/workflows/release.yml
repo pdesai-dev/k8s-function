@@ -55,23 +55,15 @@ jobs:
         echo VERSION=$VERSION
         make docker-buildx IMG=$IMAGE_ID:$VERSION
 
-    - name: release
-      uses: actions/create-release@v1
-      env:
-        GITHUB_TOKEN: ${{ github.token }}
-      id: create_release
+    - name: create release
+      uses: softprops/action-gh-release@v1
       with:
         draft: false
         prerelease: false
-        release_name: ${{ github.ref_name }}
-        tag_name: ${{ github.ref }}
-
-    - name: Upload install.yaml
-      uses: actions/upload-release-asset@v1
+        generate_release_notes: false
+        append_body: false
+        files: dist/install.yaml
       env:
-        GITHUB_TOKEN: ${{ github.token }}
-      with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./dist/install.yaml
-        asset_name: install.yaml
-        asset_content_type: text/html
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+
