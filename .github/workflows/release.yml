@@ -17,6 +17,12 @@ jobs:
 
     runs-on: ubuntu-latest
 
+    permissions:
+      contents: read
+      packages: write
+      attestations: write
+      id-token: write
+
     steps:
     - name: Setup Go environment
       uses: actions/setup-go@v5.0.2
@@ -30,22 +36,25 @@ jobs:
     - name: Build installer
       run: make build-installer
       
-    - name: Log in to registry
-      run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+    - name: Login to GitHub Container Registry
+      uses: docker/login-action@v3
+      with:
+        registry: ghcr.io
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
 
+        #VERSION=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')
     - name: Build and push image
       run: |
         IMAGE_ID=ghcr.io/${{ github.repository_owner }}/$IMAGE_NAME
         IMAGE_ID=$(echo $IMAGE_ID | tr '[A-Z]' '[a-z]')
-
-        VERSION=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')
+        VERSION=${{ github.ref_name }}
 
         [ "$VERSION" == "main" ] && VERSION=latest
         echo IMAGE_ID=$IMAGE_ID
         echo VERSION=$VERSION
-        echo ${{ github.ref_name }}
-        echo make docker-build IMG=$IMAGE_ID:$VERSION
-        echo make docker-push IMG=$IMAGE_ID:$VERSION
+        make docker-build IMG=$IMAGE_ID:$VERSION
+        make docker-push IMG=$IMAGE_ID:$VERSION
 
     #- name: release
       #uses: actions/create-release@v1
