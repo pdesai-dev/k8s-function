@@ -65,12 +65,12 @@ jobs:
         #tag_name: ${{ github.ref }}
         #body_path: CHANGELOG.md
 
-    - name: Upload install.yaml
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ github.token }}
-      with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./dist/install.yaml
-        asset_name: install.yaml
-        asset_content_type: text/html
+    #- name: Upload install.yaml
+    #  uses: actions/upload-release-asset@v1
+    #  env:
+    #    GITHUB_TOKEN: ${{ github.token }}
+    #  with:
+    #    upload_url: ${{ steps.create_release.outputs.upload_url }}
+    #    asset_path: ./dist/install.yaml
+    #    asset_name: install.yaml
+    #    asset_content_type: text/html
