@@ -19,12 +19,6 @@ jobs:
 
     runs-on: ubuntu-latest
 
-    permissions:
-      contents: read
-      packages: write
-      attestations: write
-      id-token: write
-
     steps:
     - name: Setup Go environment
       uses: actions/setup-go@v5.0.2
@@ -62,7 +56,3 @@ jobs:
         generate_release_notes: false
         append_body: false
         files: dist/install.yaml
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-
