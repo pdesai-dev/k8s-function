@@ -1,21 +1,29 @@
+name: Release Builds
 
 on:
   push:
-    tags: "release-v*"
+    tags: "v*"
   workflow_dispatch:
     inputs:
       logLevel:
         description: 'Log level'
         required: true
         default: 'warning'
-      tags:
-        description: 'Test scenario tags'
-        required: false
+
+env:
+  IMAGE_NAME: k8s-function
+  VERSION: ${{ github.ref_name }}
 
 jobs:
   build:
 
     runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      packages: write
+      attestations: write
+      id-token: write
 
     steps:
     - name: Setup Go environment
@@ -28,30 +36,33 @@ jobs:
       run: make
       
     - name: Build installer
-      run: make build-installer
+      run: |
+        IMAGE_ID=ghcr.io/${{ github.repository_owner }}/$IMAGE_NAME
+        IMAGE_ID=$(echo $IMAGE_ID | tr '[A-Z]' '[a-z]')
+        make build-installer IMG=$IMAGE_ID:$VERSION
       
-    #- name: Build Docker Image
-      #run: make docker-buildx IMG=piased/k8s-function:v0.0.0
-      
-    - name: Get version from tag
-      run: echo "VERSION=${GITHUB_REF#refs/tags/v}"
+    - name: Login to GitHub Container Registry
+      uses: docker/login-action@v3
+      with:
+        registry: ghcr.io
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
 
-    - name: release
-      uses: actions/create-release@v1
-      id: create_release
+    - name: Build and push image
+      run: |
+        IMAGE_ID=ghcr.io/${{ github.repository_owner }}/$IMAGE_NAME
+        IMAGE_ID=$(echo $IMAGE_ID | tr '[A-Z]' '[a-z]')
+        make docker-buildx IMG=$IMAGE_ID:$VERSION
+
+    - name: create release
+      uses: softprops/action-gh-release@v1
       with:
         draft: false
         prerelease: false
-        release_name: ${{ github.ref_name }}
-        tag_name: ${{ github.ref }}
-        body_path: CHANGELOG.md
-
-    - name: Upload install.yaml
-      uses: actions/upload-release-asset@v1
+        generate_release_notes: false
+        append_body: false
+        files: dist/install.yaml
       env:
-        GITHUB_TOKEN: ${{ github.token }}
-      with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./dist/install.yaml
-        asset_name: install.yaml
-        asset_content_type: text/html
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+

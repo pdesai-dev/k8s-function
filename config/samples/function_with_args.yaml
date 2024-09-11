@@ -17,11 +17,13 @@ spec:
     print(os.environ.get('key1', 'Not set'))
 
     print(f'Hello {sys.argv[1]} !')
-    sleep_time = random.uniform(5, 10)
+    sleep_time = random.uniform(10, 100)
+    print(f"Sleeping for {sleep_time:.2f} seconds")
     time.sleep(sleep_time)
-    print(f"Slept for {sleep_time:.2f} seconds")
+    print(f'Done')
   args:
     - arg1
   envVariables:
     key1: val1
   ttlSecondsAfterFinished: 20
+  handler: "hello"
