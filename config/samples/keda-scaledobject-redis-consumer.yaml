@@ -1,0 +1,21 @@
+apiVersion: keda.sh/v1alpha1
+kind: ScaledObject
+metadata:
+  name: redis-consumer-scaledobject
+  namespace: default
+spec:
+  scaleTargetRef:
+    apiVersion: k8s-function.io/v1alpha1
+    kind: Function
+    name: redis-consumer 
+  pollingInterval: 5
+  cooldownPeriod: 60
+  minReplicaCount: 0
+  maxReplicaCount: 5
+  triggers:
+  - type: redis
+    metadata:
+      address: redis.default:6379  # Address of the Redis service
+      listName: "list1"
+      listLength: "3"          # Scale when the list length reaches 3
+      activationListLength: "1" # Optional: activate scaling when list length is at least 1

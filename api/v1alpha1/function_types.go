@@ -29,9 +29,6 @@ type FunctionSpec struct {
 
 	Code string `json:"code"`
 
-	// FunctionName is the name of the function to be called
-	Handler string `json:"handler"`
-
 	// Arguments is a list of arguments to be passed to the function
 	Args []string `json:"args,omitempty"`
 
