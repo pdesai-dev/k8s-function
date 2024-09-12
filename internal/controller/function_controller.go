@@ -66,6 +66,7 @@ func (r *FunctionReconciler) Reconcile(ctx context.Context, req ctrl.Request) (c
 
 	logger.Info("Pod counts", "active", len(activePods), "desired", *function.Spec.Replicas, "completed", len(completedPods))
 
+	//return all pending first and sort by time so oldest would deleted first for scale down
 	sort.Slice(activePods, func(i, j int) bool {
 		if activePods[i].Status.Phase != activePods[j].Status.Phase {
 			return activePods[i].Status.Phase == corev1.PodPending
@@ -92,16 +93,17 @@ func (r *FunctionReconciler) Reconcile(ctx context.Context, req ctrl.Request) (c
 				return ctrl.Result{}, err
 			}
 		}
-	} else {
-		for _, pod := range completedPods {
-			completionTime := pod.CreationTimestamp.Time
-			age := time.Since(completionTime)
-			if age > time.Duration(*function.Spec.TTLSecondsAfterFinished)*time.Second {
-				logger.Info("Deleting completed Pod", "Pod.Namespace", pod.Namespace, "Pod.Name", pod.Name)
-				if err := r.Delete(ctx, &pod); err != nil {
-					logger.Error(err, "Failed to delete completed Pod", "Pod.Namespace", pod.Namespace, "Pod.Name", pod.Name)
-					return ctrl.Result{}, err
-				}
+	}
+
+	//do some cleanup
+	for _, pod := range completedPods {
+		completionTime := findCompletionTime(&pod)
+		age := time.Since(completionTime)
+		if age > time.Duration(*function.Spec.TTLSecondsAfterFinished)*time.Second {
+			logger.Info("Deleting completed Pod", "Pod.Namespace", pod.Namespace, "Pod.Name", pod.Name, "finishedAt", completionTime, "age", age)
+			if err := r.Delete(ctx, &pod); err != nil {
+				logger.Error(err, "Failed to delete completed Pod", "Pod.Namespace", pod.Namespace, "Pod.Name", pod.Name)
+				return ctrl.Result{}, err
 			}
 		}
 	}
@@ -124,6 +126,18 @@ func (r *FunctionReconciler) Reconcile(ctx context.Context, req ctrl.Request) (c
 
 	// Requeue after 5 minutes so we can do some cleanup
 	return ctrl.Result{RequeueAfter: 5 * time.Minute}, nil
+}
+
+func findCompletionTime(pod *corev1.Pod) time.Time {
+	var latestTime time.Time
+	for _, containerStatus := range pod.Status.ContainerStatuses {
+		if containerStatus.State.Terminated != nil {
+			if containerStatus.State.Terminated.FinishedAt.Time.After(latestTime) {
+				latestTime = containerStatus.State.Terminated.FinishedAt.Time
+			}
+		}
+	}
+	return latestTime
 }
 
 func (r *FunctionReconciler) podForFunction(function *k8sfunctionsv1alpha1.Function) *corev1.Pod {

@@ -25,5 +25,4 @@ spec:
     - arg1
   envVariables:
     key1: val1
-  ttlSecondsAfterFinished: 20
-  handler: "hello"
+  ttlSecondsAfterFinished: 200

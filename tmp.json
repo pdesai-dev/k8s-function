@@ -1,0 +1,65 @@
+{
+    "apiVersion": "v1",
+    "kind": "Namespace",
+    "metadata": {
+        "annotations": {
+            "cattle.io/status": "{\"Conditions\":[{\"Type\":\"ResourceQuotaInit\",\"Status\":\"True\",\"Message\":\"\",\"LastUpdateTime\":\"2024-08-20T22:06:10Z\"},{\"Type\":\"InitialRolesPopulated\",\"Status\":\"True\",\"Message\":\"\",\"LastUpdateTime\":\"2024-08-20T22:06:38Z\"}]}",
+            "lifecycle.cattle.io/create.namespace-auth": "true",
+            "management.cattle.io/no-default-sa-token": "true",
+            "management.cattle.io/system-namespace": "true"
+        },
+        "creationTimestamp": "2024-08-20T22:05:42Z",
+        "deletionTimestamp": "2024-09-12T19:57:40Z",
+        "finalizers": [
+            "controller.cattle.io/namespace-auth"
+        ],
+        "labels": {
+            "kubernetes.io/metadata.name": "p-sp5d8"
+        },
+        "name": "p-sp5d8",
+        "resourceVersion": "2062779",
+        "uid": "871c26d7-5cb9-42b1-820a-dd750f64e7d2"
+    },
+    "spec": {
+    },
+    "status": {
+        "conditions": [
+            {
+                "lastTransitionTime": "2024-09-12T19:57:45Z",
+                "message": "Discovery failed for some groups, 1 failing: unable to retrieve the complete list of server APIs: metrics.joodoo.io/v1alpha1: stale GroupVersion discovery: metrics.joodoo.io/v1alpha1",
+                "reason": "DiscoveryFailed",
+                "status": "True",
+                "type": "NamespaceDeletionDiscoveryFailure"
+            },
+            {
+                "lastTransitionTime": "2024-09-12T19:57:45Z",
+                "message": "All legacy kube types successfully parsed",
+                "reason": "ParsedGroupVersions",
+                "status": "False",
+                "type": "NamespaceDeletionGroupVersionParsingFailure"
+            },
+            {
+                "lastTransitionTime": "2024-09-12T19:57:45Z",
+                "message": "All content successfully deleted, may be waiting on finalization",
+                "reason": "ContentDeleted",
+                "status": "False",
+                "type": "NamespaceDeletionContentFailure"
+            },
+            {
+                "lastTransitionTime": "2024-09-12T19:57:45Z",
+                "message": "Some resources are remaining: rolebindings.rbac.authorization.k8s.io has 2 resource instances, roles.rbac.authorization.k8s.io has 1 resource instances",
+                "reason": "SomeResourcesRemain",
+                "status": "True",
+                "type": "NamespaceContentRemaining"
+            },
+            {
+                "lastTransitionTime": "2024-09-12T19:57:45Z",
+                "message": "Some content in the namespace has finalizers remaining: wrangler.cattle.io/auth-prov-v2-rb in 2 resource instances, wrangler.cattle.io/auth-prov-v2-role in 1 resource instances",
+                "reason": "SomeFinalizersRemain",
+                "status": "True",
+                "type": "NamespaceFinalizersRemaining"
+            }
+        ],
+        "phase": "Terminating"
+    }
+}

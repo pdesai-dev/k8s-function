@@ -1,0 +1,63 @@
+apiVersion: k8s-function.io/v1alpha1
+kind: Function
+metadata:
+  labels:
+    app.kubernetes.io/name: functions
+    app.kubernetes.io/managed-by: kustomize
+  name: redis-consumer
+spec:
+  runtimeImage: "python:3.9"
+  replicas: 1
+  code: |
+    import os
+    import time
+    import sys
+    import random
+    import subprocess
+    import importlib
+
+    def install(package):
+        subprocess.check_call([sys.executable, "-m", "pip", "install", package])
+
+    try:
+        importlib.import_module('redis')
+    except ImportError:
+        print("Redis module not found. Installing...")
+        install('redis')
+
+    import redis
+
+    # Get params
+    redis_host = os.environ.get('redis_host', 'Not set')
+    redis_list = os.environ.get('redis_list', 'Not set')
+
+    # Connect to Redis
+    redis_client = redis.Redis(host=redis_host, port=6379, db=0)
+
+
+    while True:
+        try:
+            print(f"Waiting for elements in the list '{redis_list}'...")
+            # Use BLPOP to block and wait for an element
+            # BLPOP returns a tuple (redis_list, element)
+            result = redis_client.blpop(redis_list, timeout=0)
+
+            if result:
+                list_key, element = result
+                print(f"Received: {element.decode('utf-8')}")
+                sleep_time = random.uniform(10, 20)
+                print(f"Simulate work for {sleep_time:.2f} seconds")
+                time.sleep(sleep_time)
+                print(f"Done")
+            else:
+                # This shouldn't happen with timeout=0, but just in case
+                print("No element received. This shouldn't happen with BLPOP and timeout=0.")
+
+        except Exception as e:
+            print(f"Redis error: {e}")
+            print("Retrying in 5 seconds...")
+            time.sleep(5)
+  envVariables:
+    redis_host: redis.default
+    redis_list: list1
+  ttlSecondsAfterFinished: 180

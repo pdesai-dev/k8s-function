@@ -58,9 +58,6 @@ spec:
                 description: EnvironmentVariables is a map of environment variables
                   to be set
                 type: object
-              handler:
-                description: FunctionName is the name of the function to be called
-                type: string
               replicas:
                 description: Number of pods
                 format: int32
@@ -74,7 +71,6 @@ spec:
                 type: integer
             required:
             - code
-            - handler
             - replicas
             - runtimeImage
             type: object
